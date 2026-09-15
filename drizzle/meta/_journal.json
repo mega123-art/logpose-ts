@@ -22,6 +22,13 @@
       "when": 1789470515383,
       "tag": "0002_new_human_fly",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1789472468908,
+      "tag": "0003_flat_iceman",
+      "breakpoints": true
     }
   ]
 }
