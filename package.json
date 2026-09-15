@@ -27,6 +27,8 @@
     "typescript": "^7.0.2"
   },
   "dependencies": {
+    "@noble/ciphers": "^2.4.0",
+    "base62": "^2.0.2",
     "drizzle-orm": "^0.45.2",
     "pg": "^8.23.0"
   }
