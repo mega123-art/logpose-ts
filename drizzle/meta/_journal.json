@@ -8,6 +8,20 @@
       "when": 1789467848605,
       "tag": "0000_freezing_tempest",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1789470504514,
+      "tag": "0001_windy_whistler",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1789470515383,
+      "tag": "0002_new_human_fly",
+      "breakpoints": true
     }
   ]
 }
