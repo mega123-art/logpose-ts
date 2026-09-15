@@ -1,1 +1,1 @@
-console.log("Logpose server starting...");
+console.log('Logpose server starting...');
