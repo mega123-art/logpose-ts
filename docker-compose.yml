@@ -1,0 +1,17 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: logpose-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: logpose
+
+    ports:
+      - "5435:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/postgres_data
+
+volumes:
+  postgres_data:
