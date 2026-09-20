@@ -17,3 +17,7 @@ export async function modilfyUrl(shortCode:string,newLongUrl:string) {
     return await db.update(urls).set({longUrl:newLongUrl}).where(eq(urls.shortCode,shortCode))
     
 }
+export async function getUrlsByUserId(userId:string) {
+    return await db.select().from(urls).where(eq(urls.createdBy,userId))
+    
+}
