@@ -1,85 +1,84 @@
-import { BinaryFF1 } from "@noble/ciphers/ff1.js";
+import { FF1 } from "@noble/ciphers/ff1.js";
+import { getEncryptionKey } from "../config/env.js";
+import base62 from "base62";
 
-const CHARSET =
-  "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+const RADIX=3813
+const LENGTH=2
+const LOWER_BOUND = 238_328;
+const UPPER_BOUND = 14_776_335;
+const RANGE_SIZE=UPPER_BOUND-LOWER_BOUND+1;
 
-const key = new Uint8Array(32);
-const ff1 = BinaryFF1(key);
 
-function bigIntToBase62(value: bigint): string {
-  if (value === 0n) {
-    return "0";
+function obfuscate(number: number): number {
+  const key = getEncryptionKey();
+  const ff1 = FF1(RADIX, key);
+
+  const digits = integerToDigits(number, LENGTH);
+  const encryptedDigits = ff1.encrypt(digits);
+  const encryptedNumber=digitsToInteger(encryptedDigits)
+  if (encryptedNumber<UPPER_BOUND && encryptedNumber>LOWER_BOUND){
+    return encryptedNumber
+  }
+  number=encryptedNumber
+  return obfuscate(number)
+  
+  
+}
+
+function deobfuscate(number:number):number{
+  const key=getEncryptionKey();
+  const ff1=FF1(RADIX,key)
+  const digits=integerToDigits(number,LENGTH)
+  const decryptedDigits=ff1.decrypt(digits)
+  const decryptedNumber=digitsToInteger(decryptedDigits)
+  if(decryptedNumber<RANGE_SIZE && decryptedNumber>0){
+    return decryptedNumber
+  }
+  number=decryptedNumber
+  return deobfuscate(decryptedNumber)
+
+
+}
+function integerToDigits(value: number, length: number): number[] {
+  let digits:number[] = [];
+
+  for (let index = length - 1; index >= 0; index--) {
+    digits[index] = value % RADIX;
+    value = Math.floor(value / RADIX);
   }
 
-  let result = "";
+  return digits;
+}
 
-  while (value > 0n) {
-    const remainder = value % 62n;
-    result = CHARSET[Number(remainder)] + result;
-    value = value / 62n;
+function digitsToInteger(digits:number[]):number{
+  let value=0;
+  let digit:number=0;
+  for (let index = 0; index < digits.length; index++) {
+    digit=digits[index]!
+    value=value*RADIX+digit
+
+    
   }
-
-  return result;
+  return value
 }
 
-function base62ToBigInt(value: string): bigint {
-  let result = 0n;
-
-  for (const char of value) {
-    const index = CHARSET.indexOf(char);
-
-    if (index === -1) {
-      throw new Error(`Invalid Base62 character: ${char}`);
-    }
-
-    result = result * 62n + BigInt(index);
-  }
-
-  return result;
+function encode(db_id:number):string {
+  let obs_id=obfuscate(db_id)
+  let encrypted=base62.encode(obs_id)
+  return encrypted
+  
+  
 }
-
-export function encode(databaseId: bigint): string {
-  const buffer = new ArrayBuffer(8);
-  const view = new DataView(buffer);
-
-  view.setBigUint64(0, databaseId, true);
-
-  const bytes = new Uint8Array(buffer);
-
-  const encrypted = ff1.encrypt(bytes);
-
-  const encryptedView = new DataView(
-    encrypted.buffer,
-    encrypted.byteOffset,
-    encrypted.byteLength
-  );
-
-  const encryptedNumber = encryptedView.getBigUint64(0, true);
-
-  return bigIntToBase62(encryptedNumber);
+function decode(shortCode:string):number{
+  let value=base62.decode(shortCode)
+  let decrypted=deobfuscate(value)
+  return decrypted
 }
+const original = 7912;
 
-export function decode(shortCode: string): bigint {
-  const encryptedNumber = base62ToBigInt(shortCode);
+const shortCode = encode(original);
+const result = decode(shortCode);
 
-  const buffer = new ArrayBuffer(8);
-  const view = new DataView(buffer);
-
-  view.setBigUint64(0, encryptedNumber, true);
-
-  const encryptedBytes = new Uint8Array(buffer);
-
-  const decrypted = ff1.decrypt(encryptedBytes);
-
-  const decryptedView = new DataView(
-    decrypted.buffer,
-    decrypted.byteOffset,
-    decrypted.byteLength
-  );
-
-  return decryptedView.getBigUint64(0, true);
-}
-const id = 123n;
-
-const shortCode = encode(id);
-const decodedId = decode(shortCode);
+console.log("original:", original);
+console.log("short code:", shortCode);
+console.log("decoded:", result);

@@ -43,9 +43,10 @@ export const users = pgTable('users', {
 });
 
 export const urls = pgTable('urls', {
+  databaseId: integer("database_id").primaryKey().generatedAlwaysAsIdentity(),
   shortCode: varchar('short_code', {
     length: 4,
-  }).primaryKey(),
+  }),
 
   longUrl: varchar('long_url', {
     length: 2048,

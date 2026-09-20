@@ -36,6 +36,13 @@
       "when": 1789473059946,
       "tag": "0004_thin_ricochet",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1789593451977,
+      "tag": "0005_modern_steel_serpent",
+      "breakpoints": true
     }
   ]
 }
